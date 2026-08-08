@@ -53,7 +53,7 @@ export default async function handler(req,res){
   if(req.method==='GET'){
     try{
       const source=await loadHtml();
-      return res.status(200).json({ok:true,name:'camera-director',version:'0.3.0',bytes:Buffer.byteLength(source),poseable:source.includes('TransformControls')&&source.includes('Move Person')});
+      return res.status(200).json({ok:true,name:'camera-director',version:'0.3.0',bytes:Buffer.byteLength(source),poseable:source.includes('TransformControls')&&/move person/i.test(source)});
     }catch(error){return res.status(500).json({ok:false,error:error instanceof Error?error.message:String(error)})}
   }
   if(req.method!=='POST') return res.status(405).send('Use GET or POST');
