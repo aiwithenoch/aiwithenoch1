@@ -47,10 +47,16 @@ async function rpc(message){
 
 export default async function handler(req,res){
   res.setHeader('Access-Control-Allow-Origin','*');
-  res.setHeader('Access-Control-Allow-Methods','POST, OPTIONS');
+  res.setHeader('Access-Control-Allow-Methods','GET, POST, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers','content-type, accept, mcp-session-id, mcp-protocol-version');
   if(req.method==='OPTIONS') return res.status(204).end();
-  if(req.method!=='POST') return res.status(405).send('Use POST');
+  if(req.method==='GET'){
+    try{
+      const source=await loadHtml();
+      return res.status(200).json({ok:true,name:'camera-director',version:'0.3.0',bytes:Buffer.byteLength(source),poseable:source.includes('TransformControls')&&source.includes('Move Person')});
+    }catch(error){return res.status(500).json({ok:false,error:error instanceof Error?error.message:String(error)})}
+  }
+  if(req.method!=='POST') return res.status(405).send('Use GET or POST');
   let body=req.body;
   if(typeof body==='string'){
     try{body=JSON.parse(body||'{}')}catch{return res.status(400).json(bad(null,-32700,'Parse error'))}
